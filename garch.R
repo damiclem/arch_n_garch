@@ -1,4 +1,5 @@
 # Libraries
+
 library(fGarch)
 library(rugarch)
 library(quantmod)
@@ -18,7 +19,9 @@ for(i in 2:1000) {
 }
 
 # Plot simulated ARCH(1) series
-plot(arch1.e, type='l', col='blue')
+plot(arch1.e, type='l', col='blue', xlab="t", ylab="Error", main="ARCH(1)")
+abline(h=0, col="black")
+
 # Plot ACF and PACF
 par(mfrow=c(1, 2)) # Set plots layout
 acf(arch1.e, lag.max=30, type='correlation', plot=T, main='ACF')
@@ -26,12 +29,15 @@ acf(arch1.e, lag.max=30, type='partial', plot=T, main='PACF')
 # Plot qqplot and distribution
 qqnorm(arch1.e, pch=1, frame=F, main='Quantiles') # QQplot
 qqline(arch1.e, col="steelblue", lwd=2) # Add QQline
-hist(arch1.e, freq=F, main='Distribution') # Distplot (histogram)
+hist(arch1.e, freq=F, main='Distribution', xlab="Errors", ylim=c(0,0.25)) # Distplot (histogram)
 lines(density(arch1.e)) # Distplot (kde)
 par(mfrow=c(1,1)) # Reset plots layout
 
 # Plot squared residuals
-plot(arch1.e**2, type='l', col='blue')
+par(mfrow=c(1, 1)) # Set plots layout
+plot(arch1.e**2, type='l', col='blue', xlab="t", ylab="Squared errors", main="Squared errors")
+#qqnorm(arch1.e**2, pch=1, frame=F, main='Quantiles') # QQplot
+#qqline(arch1.e, col="steelblue", lwd=2) # Add QQline
 # Plot ACF and PACF
 par(mfrow=c(1, 2)) # Set plots layout
 acf(arch1.e**2, lag.max=30, type='correlation', plot=T, main='ACF')
@@ -52,6 +58,11 @@ model <- ugarchspec(
 model.fit <- ugarchfit(spec=model, data=arch1.e)
 model.fit
 
+
+###################################################################################################################
+#GARCH
+
+
 # Simulate GARCH(1,1) series
 garch11.a0 <- 0.2
 garch11.a1 <- 0.5
@@ -68,6 +79,7 @@ for(i in 2:10000) {
 
 # Plot simulated ARCH(1) series
 plot(garch11.e, type='l', col='blue')
+abline(h=0, col="black")
 # Plot ACF and PACF
 par(mfrow=c(1, 2)) # Set plots layout
 acf(garch11.e, lag.max=30, type='correlation', plot=T, main='ACF')
@@ -75,12 +87,16 @@ acf(garch11.e, lag.max=30, type='partial', plot=T, main='PACF')
 # Plot qqplot and distribution
 qqnorm(garch11.e, pch=1, frame=F, main='Quantiles') # QQplot
 qqline(garch11.e, col="steelblue", lwd=2) # Add QQline
-hist(garch11.e, freq=F, main='Distribution') # Distplot (histogram)
+hist(garch11.e, freq=F, main='Distribution', ylim=c(0,0.4)) # Distplot (histogram)
 lines(density(garch11.e)) # Distplot (kde)
 par(mfrow=c(1,1)) # Reset plots layout
 
 # Plot squared residuals
 plot(garch11.e**2, type='l', col='blue')
+#qqnorm(garch11.e**2, pch=1, frame=F, main='Quantiles') # QQplot
+#qqline(garch11.e**2, col="steelblue", lwd=2) # Add QQline
+
+
 # Plot ACF and PACF
 par(mfrow=c(1, 2)) # Set plots layout
 acf(garch11.e**2, lag.max=30, type='correlation', plot=T, main='ACF')
@@ -97,8 +113,9 @@ model <- ugarchspec(
 model.fit <- ugarchfit(spec=model, data=garch11.e)
 model.fit
 
-
+################################################################################################################
 # Wilshere 5000 index
+
 # Read wilshere 5000 index data
 W5000 <- read.csv2('data/wilshire5000.csv', stringsAsFactors=F, header=T, sep=',', na.strings='.')
 # Parse data
