@@ -1,6 +1,7 @@
 # Libraries
-# library(fGarch)
+library(fGarch)
 library(rugarch)
+library(quantmod)
 
 # Set random seed
 set.seed(13)
@@ -89,9 +90,64 @@ par(mfrow=c(1,1)) # Reset plots layout
 # Define GARCH(1, 1) model
 model <- ugarchspec(
   mean.model=list(armaOrder=c(0,0), include.mean=F),
-  variance.model=list(model="sGARCH", garchOrder=c(1,1)),
+  variance.model=list(model='sGARCH', garchOrder=c(1,1)),
   distribution.model='norm'
 )
 # Fit the model
 model.fit <- ugarchfit(spec=model, data=garch11.e)
 model.fit
+
+
+# Wilshere 5000 index
+# Read wilshere 5000 index data
+W5000 <- read.csv2('data/wilshire5000.csv', stringsAsFactors=F, header=T, sep=',', na.strings='.')
+# Parse data
+W5000$DATE <- as.Date(W5000$DATE)
+W5000$WILL5000INDFC <- as.numeric(W5000$WILL5000INDFC)
+# Clean the data: remove rows with NAs
+W5000 <- na.omit(W5000)
+# Compute new dataset containing daily percentage changes
+W5000_PC <- data.frame(
+  # Keep same date column
+  'Date' = W5000$DATE,
+  # Compute new value as percent difference wrt previous index value
+  'Value' = as.numeric(Delt(W5000$WILL5000INDFC) * 100)
+)
+# Clean new dataset data
+W5000_PC <- na.omit(W5000_PC)
+
+# Plot percentage changes
+plot(W5000_PC, ylab='Percent', main='Daily Percentage Changes', type='l', col='steelblue', lwd=0.5)
+abline(0, 0) # Add horizontal line at y = 0
+
+# Plot ACF and PACF
+par(mfrow=c(1, 2)) # Set layout
+acf(W5000_PC$Value, type='correlation', main='Wilshire 5000 Series ACF')
+acf(W5000_PC$Value, type='partial', main='Wilshire 5000 Series PACF')
+par(mfrow=c(1, 1)) # Reset layout
+
+# Define GARCH(1,1) model of daily percentage changes
+model <- ugarchspec(
+  mean.model=list(armaOrder=c(0,0), include.mean=T),
+  variance.model=list(model='sGARCH', garchOrder=c(1,1)),
+  distribution.model='norm'
+)
+# Estimate coefficients for the model
+model.fit <- ugarchfit(spec=model, data=W5000_PC$Value)
+model.fit
+# Save fitted model coefficients
+model.coef <- coef(model.fit)
+model.coef
+
+# Add column to dataset: deviance from the mean (first coefficient)
+W5000_PC$Dev <- W5000_PC$Value - model.coef[1]
+
+# Plot deviation of percentage changes from mean
+plot(W5000_PC$Date, W5000_PC$Dev, type = 'l', lwd = 0.2, col = 'steelblue', 
+     ylab = 'Percent', xlab = 'Date',
+     main = 'Estimated Bands of +- One Conditional Standard Deviation')
+# Add horizontal line at y = 0
+abline(0, 0)
+# Add GARCH(1,1) confidence bands (one standard deviation) to the plot
+lines(W5000_PC$Date, model.coef[1] + sigma(model.fit), col = 'darkred', lwd = 0.5)
+lines(W5000_PC$Date, model.coef[1] - sigma(model.fit), col = 'darkred', lwd = 0.5)
