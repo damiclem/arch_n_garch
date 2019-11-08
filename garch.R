@@ -1,6 +1,5 @@
 # Libraries
-
-library(fGarch)
+# library(fGarch)
 library(rugarch)
 library(quantmod)
 
@@ -19,7 +18,7 @@ for(i in 2:1000) {
 }
 
 # Plot simulated ARCH(1) series
-plot(arch1.e, type='l', col='blue', xlab="t", ylab="Error", main="ARCH(1)")
+plot(arch1.e, type='l', col='steelblue', xlab="t", ylab="Residuals", main="ARCH(1)")
 abline(h=0, col="black")
 
 # Plot ACF and PACF
@@ -28,14 +27,14 @@ acf(arch1.e, lag.max=30, type='correlation', plot=T, main='ACF')
 acf(arch1.e, lag.max=30, type='partial', plot=T, main='PACF')
 # Plot qqplot and distribution
 qqnorm(arch1.e, pch=1, frame=F, main='Quantiles') # QQplot
-qqline(arch1.e, col="steelblue", lwd=2) # Add QQline
-hist(arch1.e, freq=F, main='Distribution', xlab="Errors", ylim=c(0,0.25)) # Distplot (histogram)
-lines(density(arch1.e)) # Distplot (kde)
+qqline(arch1.e, col='steelblue', lwd=2) # Add QQline
+hist(arch1.e, freq=F, main='Distribution', xlab='Residuals', ylim=c(0,0.25)) # Distplot (histogram)
+lines(density(arch1.e), col='steelblue', lwd=2) # Distplot (kde)
 par(mfrow=c(1,1)) # Reset plots layout
 
 # Plot squared residuals
 par(mfrow=c(1, 1)) # Set plots layout
-plot(arch1.e**2, type='l', col='blue', xlab="t", ylab="Squared errors", main="Squared errors")
+plot(arch1.e**2, type='l', col='blue', xlab="t", ylab="Squared residuals", main="Squared residuals")
 #qqnorm(arch1.e**2, pch=1, frame=F, main='Quantiles') # QQplot
 #qqline(arch1.e, col="steelblue", lwd=2) # Add QQline
 # Plot ACF and PACF
@@ -58,6 +57,29 @@ model <- ugarchspec(
 model.fit <- ugarchfit(spec=model, data=arch1.e)
 model.fit
 
+# # Plot ARCH(1) residuals
+# layout(mat = matrix(c(1, 1, 2, 3), nrow = 2, byrow = T),
+#        heights = c(1, 1), # Heights of the two rows
+#        widths = c(1, 1)) # Widths of the two columns
+# # Plot 1: ARCH residuals
+# plot(arch1.e, type='l', col='steelblue', xlab="t", ylab="Residuals", main="ARCH(1)")
+# # Plot 2: ARCH residuals qqplot
+# qqnorm(arch1.e, pch=1, frame=F, main='Quantiles') # QQplot
+# qqline(arch1.e, col='steelblue', lwd=2) # Add QQline
+# # Plot 3: ARCH residuals PACF
+# acf(arch1.e, lag.max=30, type='partial', plot=T, main='PACF')
+# 
+# # Plot ARCH(1) squared  residuals
+# # layout(mat = matrix(c(1, 1, 2, 3), nrow = 2, byrow = T),
+# #        heights = c(1, 1), # Heights of the two rows
+# #        widths = c(1, 1)) # Widths of the two columns
+# # Plot 1: ARCH squared residuals
+# plot(arch1.e**2, type='l', col='steelblue', xlab="t", ylab="Squared Residuals", main="ARCH(1)")
+# # Plot 2: ARCH squared residuals ACF
+# acf(arch1.e**2, lag.max=30, type='correlation', plot=T, main='ACF')
+# # Plot 3: ARCH squared residuals PACF
+# acf(arch1.e**2, lag.max=30, type='partial', plot=T, main='PACF')
+
 
 ###################################################################################################################
 #GARCH
@@ -78,7 +100,7 @@ for(i in 2:10000) {
 }
 
 # Plot simulated ARCH(1) series
-plot(garch11.e, type='l', col='blue')
+plot(garch11.e, type='l', col='steelblue')
 abline(h=0, col="black")
 # Plot ACF and PACF
 par(mfrow=c(1, 2)) # Set plots layout
@@ -87,12 +109,12 @@ acf(garch11.e, lag.max=30, type='partial', plot=T, main='PACF')
 # Plot qqplot and distribution
 qqnorm(garch11.e, pch=1, frame=F, main='Quantiles') # QQplot
 qqline(garch11.e, col="steelblue", lwd=2) # Add QQline
-hist(garch11.e, freq=F, main='Distribution', ylim=c(0,0.4)) # Distplot (histogram)
-lines(density(garch11.e)) # Distplot (kde)
+hist(garch11.e, freq=F, main='Distribution', ylim=c(0,0.55)) # Distplot (histogram)
+lines(density(garch11.e), col='steelblue', lwd=2) # Distplot (kde)
 par(mfrow=c(1,1)) # Reset plots layout
 
 # Plot squared residuals
-plot(garch11.e**2, type='l', col='blue')
+plot(garch11.e**2, type='l', col='steelblue', ylab='Residuals squared')
 #qqnorm(garch11.e**2, pch=1, frame=F, main='Quantiles') # QQplot
 #qqline(garch11.e**2, col="steelblue", lwd=2) # Add QQline
 
@@ -111,7 +133,32 @@ model <- ugarchspec(
 )
 # Fit the model
 model.fit <- ugarchfit(spec=model, data=garch11.e)
-model.fit
+model.fit@fit$z
+
+# # Plot GARCH(1, 1) residuals
+# layout(mat = matrix(c(1, 1, 2, 3), nrow = 2, byrow = T),
+#        heights = c(1, 1), # Heights of the two rows
+#        widths = c(1, 1)) # Widths of the two columns
+# # Plot 1: ARCH residuals
+# plot(garch11.e, type='l', col='steelblue', xlab="t", ylab="Residuals", main="GARCH(1,1)")
+# abline(0, 0)
+# # Plot 2: ARCH residuals qqplot
+# qqnorm(garch11.e, pch=1, frame=F, main='Quantiles') # QQplot
+# qqline(garch11.e, col='steelblue', lwd=2) # Add QQline
+# # Plot 3: ARCH residuals PACF
+# acf(garch11.e, lag.max=30, type='partial', plot=T, main='PACF')
+# 
+# # Plot ARCH(1) squared  residuals
+# # layout(mat = matrix(c(1, 1, 2, 3), nrow = 2, byrow = T),
+# #        heights = c(1, 1), # Heights of the two rows
+# #        widths = c(1, 1)) # Widths of the two columns
+# # Plot 1: ARCH squared residuals
+# plot(garch11.e**2, type='l', col='steelblue', xlab="t", ylab="Squared Residuals", main="GARCH(1,1)")
+# # Plot 2: ARCH squared residuals ACF
+# acf(garch11.e**2, lag.max=30, type='correlation', plot=T, main='ACF')
+# # Plot 3: ARCH squared residuals PACF
+# acf(garch11.e**2, lag.max=30, type='partial', plot=T, main='PACF')
+
 
 ################################################################################################################
 # Wilshere 5000 index
@@ -134,7 +181,7 @@ W5000_PC <- data.frame(
 W5000_PC <- na.omit(W5000_PC)
 
 # Plot percentage changes
-plot(W5000_PC, ylab='Percent', main='Daily Percentage Changes', type='l', col='steelblue', lwd=0.5)
+plot(W5000_PC$Date, W5000_PC$Value, ylab='Percent', main='Daily Percentage Changes', type='l', col='steelblue', lwd=0.5)
 abline(0, 0) # Add horizontal line at y = 0
 
 # Plot ACF and PACF
@@ -162,9 +209,39 @@ W5000_PC$Dev <- W5000_PC$Value - model.coef[1]
 # Plot deviation of percentage changes from mean
 plot(W5000_PC$Date, W5000_PC$Dev, type = 'l', lwd = 0.2, col = 'steelblue', 
      ylab = 'Percent', xlab = 'Date',
-     main = 'Estimated Bands of +- One Conditional Standard Deviation')
+     main = 'Estimated bands of +- 1 conditional std. dev.')
 # Add horizontal line at y = 0
 abline(0, 0)
 # Add GARCH(1,1) confidence bands (one standard deviation) to the plot
 lines(W5000_PC$Date, model.coef[1] + sigma(model.fit), col = 'darkred', lwd = 0.5)
 lines(W5000_PC$Date, model.coef[1] - sigma(model.fit), col = 'darkred', lwd = 0.5)
+
+# # Wilshere 5000 plots 
+# layout(mat = matrix(c(1, 1, 2, 3), nrow = 2, byrow = T),
+#        heights = c(1, 1), # Heights of the two rows
+#        widths = c(1, 1)) # Widths of the two columns
+# # Plot 1: WILSHERE 5000 index scatterplot
+# plot(W5000_PC$Date, W5000_PC$Value, ylab='Percent', main='Wilshere 5000 Daily Percentage Changes', type='l', col='steelblue', lwd=0.5, xlab='Date')
+# abline(0, 0) # Add horizontal line at y = 0
+# # Plot 2: Wilshere 5000 ACF
+# acf(W5000_PC$Value, type='correlation', main='Wilshire 5000 Series ACF')
+# # Plot 3: Wilshere 5000 PACF
+# acf(W5000_PC$Value, type='partial', main='Wilshire 5000 Series PACF')
+# 
+# layout(mat = matrix(c(1), nrow = 1, byrow = T))
+# # Plot 1: WILSHERE 5000 index scatterplot
+# plot(W5000_PC$Date, W5000_PC$Value, ylab='Percent', main='Wilshere 5000 Daily Percentage Changes', type='l', col='steelblue', lwd=0.5)
+# abline(0, 0) # Add horizontal line at y = 0
+# # Plot 2: deviation of percentage changes from mean
+# plot(W5000_PC$Date, W5000_PC$Dev, type = 'l', lwd = 0.2, col = 'steelblue',
+#      ylab = 'Percent', xlab = 'Date',
+#      main = 'Estimated bands of +- 1 conditional std. dev.')
+# # Add horizontal line at y = 0
+# abline(0, 0)
+# # Add GARCH(1,1) confidence bands (one standard deviation) to the plot
+# lines(W5000_PC$Date, model.coef[1] + sigma(model.fit), col = 'orange', lwd = 0.5)
+# lines(W5000_PC$Date, model.coef[1] - sigma(model.fit), col = 'orange', lwd = 0.5)
+
+
+
+
